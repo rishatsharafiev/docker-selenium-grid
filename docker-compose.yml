@@ -2,8 +2,8 @@ version: "3"
 networks:
   backend:
     driver: overlay
-    driver_opts:
-      encrypted: "1"
+    # driver_opts:
+    #   encrypted: "1"
 services:
   hub:
     image: selenium/hub:3.12.0-boron
@@ -21,8 +21,9 @@ services:
       - hub
     environment:
       - HUB_PORT_4444_TCP_ADDR=hub
-      - HUB_PORT_4444_TCP_PORT=4444
-      - NODE_MAX_SESSION=1
+      - HUB_PORT_4444_TCP_PORT=${SELENIUM_HUB_PORT}
+      - NODE_MAX_INSTANCES=${NODE_MAX_INSTANCES}
+      - NODE_MAX_SESSION=${NODE_MAX_SESSION}
     entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5556" /opt/bin/entry_point.sh'
     ports:
       - "${SELENIUM_NODE_CHROME_PORT}:5556"
@@ -32,8 +33,8 @@ services:
         condition: on-failure
       resources:
         limits:
-          cpus: "0.2"
-          memory: 100M
+          cpus: "1"
+          memory: 200M
       placement:
         constraints: [node.role != manager]
     networks:
