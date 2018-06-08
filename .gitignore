@@ -111,3 +111,5 @@ ENV/
 
 links.json
 output.csv
+
+tests/*.png
