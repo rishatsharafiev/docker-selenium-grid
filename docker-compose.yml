@@ -1,0 +1,88 @@
+version: "3"
+networks:
+  backend:
+    driver: overlay
+    driver_opts:
+      encrypted: "1"
+services:
+  hub:
+    image: selenium/hub:3.12.0-boron
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.role == manager]
+    ports:
+      - "${SELENIUM_HUB_PORT}:4444"
+    networks:
+      - backend
+  chrome:
+    image: selenium/node-chrome:3.12.0-boron
+    depends_on:
+      - hub
+    environment:
+      - HUB_PORT_4444_TCP_ADDR=hub
+      - HUB_PORT_4444_TCP_PORT=4444
+      - NODE_MAX_SESSION=1
+    entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME -port 5556" /opt/bin/entry_point.sh'
+    ports:
+      - "${SELENIUM_NODE_CHROME_PORT}:5556"
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 100M
+      placement:
+        constraints: [node.role != manager]
+    networks:
+      - backend
+  postgres:
+    image: postgres:9.6-alpine
+    volumes:
+      - ${DATA_PATH_HOST}/postgres:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    deploy:
+      restart_policy:
+        condition: any
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - backend
+  portainer:
+    image: portainer/portainer:latest
+    ports:
+      - "${PORTAINER_PORT}:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/ra/portainer/data:/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - backend
+  cadvisor:
+    image: google/cadvisor:latest
+    ports:
+      - "${CADVISOR_PORT}:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == manager]
+    networks:
+      - backend
