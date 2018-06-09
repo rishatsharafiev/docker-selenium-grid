@@ -7,6 +7,16 @@ networks:
 services:
   hub:
     image: selenium/hub:3.12.0-boron
+    environment:
+      - GRID_NEW_SESSION_WAIT_TIMEOUT=-1
+      - GRID_THROW_ON_CAPABILITY_NOT_PRESENT=true
+      - GRID_JETTY_MAX_THREADS=-1
+      - GRID_CLEAN_UP_CYCLE=5000
+      - GRID_BROWSER_TIMEOUT=20000
+      - GRID_TIMEOUT=20000
+      - GRID_DEBUG=false
+      # - JAVA_OPTS="-Xmx1g"
+      # - SE_OPTS="-DPOOL_MAX=512"
     deploy:
       mode: global
       placement:
@@ -39,6 +49,8 @@ services:
         constraints: [node.role != manager]
     networks:
       - backend
+    volumes:
+      - /dev/shm:/dev/shm
   postgres:
     image: postgres:9.6-alpine
     volumes:
