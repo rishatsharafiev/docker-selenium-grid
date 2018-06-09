@@ -1,4 +1,5 @@
 import unittest
+import time
 
 from selenium import webdriver
 from selenium.webdriver.common import proxy
@@ -24,14 +25,16 @@ class TestRosAccreditationSite(unittest.TestCase):
         driver = None
         try:
             driver = webdriver.Remote(command_executor=self.selenium_grid_url, desired_capabilities=self.options.to_capabilities())
-            page_url = 'https://ipinfo.info/html/ip_checker.php'
+            page_url = 'http://188.254.71.82/rds_ts_pub/?show=view&id_object=556AE866F9B347A497651EBAD80B3EEE'
             driver.get(page_url)
             driver.get_screenshot_as_file('./proxy.png')
-            wait = WebDriverWait(driver, 0.5*60)
-            ip_address = wait.until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, '#Text14 > p > span > a > b'))
-            )
-            print(ip_address.text if ip_address else 'None')
+            time.sleep(10)
+            driver.get_screenshot_as_file('./proxy2.png')
+            # wait = WebDriverWait(driver, 0.5*60)
+            # ip_address = wait.until(
+            #     EC.presence_of_element_located((By.CSS_SELECTOR, '#Text14 > p > span > a > b'))
+            # )
+            # print(ip_address.text if ip_address else 'None')
         except (KeyboardInterrupt, Exception) as e:
             print('---> ', str(e))
             if driver:
