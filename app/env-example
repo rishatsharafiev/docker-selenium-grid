@@ -1,0 +1,5 @@
+PS_DB_NAME=ra
+PS_USER=ra
+PS_PASSWORD=ra
+PS_HOST=localhost
+PS_PORT=5432

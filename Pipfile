@@ -13,6 +13,7 @@ name = "pypi"
 
 selenium = "==3.12.*"
 "psycopg2-binary" = "==2.7.*"
+python-dotenv = "*"
 
 
 [requires]
