@@ -64,6 +64,8 @@ class TestRosAccreditationSite(unittest.TestCase):
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#ContainerGrid'))
             )
 
+            driver.execute_script('window.tableManager.changePerPage(100)')
+
             long_wait = WebDriverWait(driver, 30*60)
             cl_last = long_wait.until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '.cl_last'))
@@ -74,7 +76,7 @@ class TestRosAccreditationSite(unittest.TestCase):
             regexp = r'page_noid_=(?P<last_page>\d+)'
             result = re.search(regexp, onclick, re.I | re.U)
             last_page = result.group('last_page')
-            print(last_page)
+
 
 
             with psycopg2.connect(dbname=PS_DB_NAME, user=PS_USER, password=PS_PASSWORD, host=PS_HOST, port=PS_PORT) as connection:
@@ -88,6 +90,9 @@ class TestRosAccreditationSite(unittest.TestCase):
                     cursor.execute(sql_string)
 
                     pages = [row[0] for row in cursor.fetchall()]
+
+                    print('Ready {ready} of {all}'.format(ready=len(pages), all=last_page))
+
                     script = """downloadPage('index.php',
                         'ajax=main&' + tableManager.getControlsData() + '&idid_=content-table'+getDivContent('tableContent-content-table')+
                         '&page_byid_=100&page_noid_={page_id}',
