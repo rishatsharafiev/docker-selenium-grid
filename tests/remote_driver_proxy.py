@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-class TestRosAccreditationSite(unittest.TestCase):
+class TestSite(unittest.TestCase):
 
     def setUp(self):
         proxy_protocol = 'http'
@@ -21,7 +21,7 @@ class TestRosAccreditationSite(unittest.TestCase):
         self.selenium_grid_url = 'http://188.246.227.206:4444/wd/hub'
 
 
-    def test_proxy(self):
+    def test_site(self):
         driver = None
         try:
             driver = webdriver.Remote(command_executor=self.selenium_grid_url, desired_capabilities=self.options.to_capabilities())

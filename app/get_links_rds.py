@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os
 from dotenv import load_dotenv
 
@@ -18,7 +20,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-class TestRosAccreditationSite(unittest.TestCase):
+class TestSite(unittest.TestCase):
 
     def setUp(self):
         # logger
@@ -64,7 +66,9 @@ class TestRosAccreditationSite(unittest.TestCase):
                 EC.presence_of_element_located((By.CSS_SELECTOR, '#ContainerGrid'))
             )
 
-            driver.execute_script('window.tableManager.changePerPage(100)')
+            page_object_count = 100
+
+            driver.execute_script('window.tableManager.changePerPage({count})'.format(count=page_object_count))
 
             long_wait = WebDriverWait(driver, 30*60)
             cl_last = long_wait.until(
@@ -76,8 +80,6 @@ class TestRosAccreditationSite(unittest.TestCase):
             regexp = r'page_noid_=(?P<last_page>\d+)'
             result = re.search(regexp, onclick, re.I | re.U)
             last_page = result.group('last_page')
-
-
 
             with psycopg2.connect(dbname=PS_DB_NAME, user=PS_USER, password=PS_PASSWORD, host=PS_HOST, port=PS_PORT) as connection:
                 with connection.cursor() as cursor:
@@ -95,13 +97,13 @@ class TestRosAccreditationSite(unittest.TestCase):
 
                     script = """downloadPage('index.php',
                         'ajax=main&' + tableManager.getControlsData() + '&idid_=content-table'+getDivContent('tableContent-content-table')+
-                        '&page_byid_=100&page_noid_={page_id}',
+                        '&page_byid_={count}&page_noid_={page_id}',
                         'tableContent-content-table');
                     """
 
                     for page_id in range(0, int(last_page)):
                         if page_id not in pages:
-                            driver.execute_script(script.format(page_id=page_id))
+                            driver.execute_script(script.format(page_id=page_id, count=page_object_count))
                             container_grid = long_wait.until(
                                 EC.presence_of_element_located((By.CSS_SELECTOR, '.cl_navigPage'))
                             )
@@ -135,7 +137,7 @@ class TestRosAccreditationSite(unittest.TestCase):
             if driver:
                 driver.quit()
 
-    def test_proxy(self):
+    def test_site(self):
         self.save_links()
 
 if __name__ == '__main__':

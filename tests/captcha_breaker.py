@@ -35,7 +35,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import WebDriverException, NoSuchElementException, TimeoutException
 
-class TestRosAccreditationSite(unittest.TestCase):
+class TestSite(unittest.TestCase):
 
     def setUp(self):
         proxy_protocol = 'http'
@@ -48,7 +48,7 @@ class TestRosAccreditationSite(unittest.TestCase):
         self.selenium_grid_url = 'http://188.246.227.206:4444/wd/hub'
 
 
-    def test_proxy(self):
+    def test_site(self):
         captcha_img = 'captcha.png'
         src_img = 'src.png'
         scale_img = 'scale.png'
